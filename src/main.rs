@@ -25,6 +25,33 @@ fn encrypt(plaintext: &str, key: &str) -> String {
     ciphertext
 }
 
+fn decrypt(ciphertext: &str, key: &str) -> String {
+    // Store the length of the key as a u32
+    let m = key.len() as u32;
+    // Declare a new empty string to store the plaintext
+    let mut plaintext = String::new();
+    // Keep track of current position of key
+    let mut key_pos = 0;
+    // Iterate through the ciphertext, getting the character of each element
+    for character in ciphertext.chars() {
+        // Check if current character is a space
+        if !character.is_whitespace() {
+            // Shift the character back by the corresponding character in the key, using the modulus operator
+            // and adding 26 to handle negative numbers, then wrap around to the start of the key if we've exceeded its length
+            let shifted = (character as u32 + 26 - key.chars().nth(key_pos % m as usize).unwrap() as u32) % 26;
+            // Add the shifted character to the plaintext, converting it back to a character
+            // by adding the ASCII value of 'A'
+            plaintext.push((shifted as u8 + b'A') as char);
+            key_pos += 1;
+        } else {
+            // if it is a space, just append it to the plaintext
+            plaintext.push(character);
+        }
+    }
+    // Return the completed plaintext
+    plaintext
+}
+
 // main() is used purely to test the code, just hardcode plaintext and key values below
 // Note that this program works properly only with capital letters of English alphabet and spaces,
 // so consider enabling Caps Lock before changing anything)
@@ -35,4 +62,6 @@ fn main() {
     println!("Plaintext: {}", plaintext);
     println!("Key: {}", key);
     println!("Ciphertext: {}", ciphertext);
+    let plaintext = decrypt(&ciphertext, key);
+    println!("Decrypted ciphertext: {}", plaintext);
 }
